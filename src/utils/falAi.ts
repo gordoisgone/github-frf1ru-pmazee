@@ -74,10 +74,30 @@ export async function generateImages(prompt: string): Promise<string[]> {
     if (result && 'images' in result && Array.isArray(result.images)) {
       const imageUrls = result.images.map(image => image.url);
       console.log("Generated image URLs:", imageUrls);
-      return imageUrls;
+      
+      // Verify that the URLs are valid
+      const validUrls = await Promise.all(imageUrls.map(async (url) => {
+        try {
+          const response = await fetch(url, { method: 'HEAD' });
+          return response.ok ? url : null;
+        } catch (error) {
+          console.error(`Error verifying URL ${url}:`, error);
+          return null;
+        }
+      }));
+      
+      const filteredUrls = validUrls.filter((url): url is string => url !== null);
+      console.log("Filtered valid image URLs:", filteredUrls);
+      
+      if (filteredUrls.length === 0) {
+        console.error('No valid image URLs found');
+        return [];
+      }
+      
+      return filteredUrls;
     } else {
       console.error('Unexpected result format:', JSON.stringify(result, null, 2));
-      throw new Error('Unexpected result format');
+      return [];
     }
   } catch (error) {
     console.error('Error generating images:', error);
@@ -86,8 +106,6 @@ export async function generateImages(prompt: string): Promise<string[]> {
       console.error('Error message:', error.message);
       console.error('Error stack:', error.stack);
     }
-    // Instead of throwing, return an empty array and log the error
-    console.error('Returning empty array due to error');
     return [];
   }
 }
