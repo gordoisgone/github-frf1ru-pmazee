@@ -35,8 +35,11 @@ async function embellishPrompt(prompt: string): Promise<string> {
 }
 
 export async function generateImages(prompt: string): Promise<string[]> {
-  const embellishedPrompt = await embellishPrompt(prompt);
+  console.log("generateImages function called with prompt:", prompt);
   try {
+    const embellishedPrompt = await embellishPrompt(prompt);
+    console.log("Embellished prompt:", embellishedPrompt);
+
     const result = await fal.subscribe("fal-ai/realistic-vision", {
       input: {
         loras: [
@@ -71,6 +74,11 @@ export async function generateImages(prompt: string): Promise<string[]> {
     }
   } catch (error) {
     console.error('Error generating images:', error);
+    console.error('Error details:', error);
+    if (error instanceof Error) {
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+    }
     throw error;
   }
 }
