@@ -37,9 +37,11 @@ async function embellishPrompt(prompt: string): Promise<string> {
 export async function generateImages(prompt: string): Promise<string[]> {
   console.log("generateImages function called with prompt:", prompt);
   try {
+    console.log("Attempting to embellish prompt...");
     const embellishedPrompt = await embellishPrompt(prompt);
     console.log("Embellished prompt:", embellishedPrompt);
 
+    console.log("Calling fal.subscribe...");
     const result = await fal.subscribe("fal-ai/realistic-vision", {
       input: {
         loras: [
@@ -67,9 +69,14 @@ export async function generateImages(prompt: string): Promise<string[]> {
       },
     }) as ImageResult;
 
+    console.log("fal.subscribe completed. Result:", result);
+
     if (result && 'images' in result && Array.isArray(result.images)) {
-      return result.images.map(image => image.url);
+      const imageUrls = result.images.map(image => image.url);
+      console.log("Generated image URLs:", imageUrls);
+      return imageUrls;
     } else {
+      console.error('Unexpected result format:', result);
       throw new Error('Unexpected result format');
     }
   } catch (error) {
@@ -79,7 +86,9 @@ export async function generateImages(prompt: string): Promise<string[]> {
       console.error('Error message:', error.message);
       console.error('Error stack:', error.stack);
     }
-    throw error;
+    // Instead of throwing, return an empty array and log the error
+    console.error('Returning empty array due to error');
+    return [];
   }
 }
 
