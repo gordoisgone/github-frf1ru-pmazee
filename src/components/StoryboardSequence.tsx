@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import { Button } from "./ui/button";
 import { motion, AnimatePresence } from 'framer-motion';
 import { Input } from "./ui/input";
@@ -10,8 +10,6 @@ interface StoryboardSequenceProps {
   onDelete?: () => void
   onSave?: () => void
   showControls: boolean
-  selectedImages: Set<string>
-  toggleImageSelection: (imageUrl: string) => void
   onUpdateImage: (oldImageUrl: string, newImageUrl: string) => void
 }
 
@@ -20,8 +18,6 @@ const StoryboardSequence: React.FC<StoryboardSequenceProps> = ({
   onDelete, 
   onSave, 
   showControls, 
-  selectedImages, 
-  toggleImageSelection,
   onUpdateImage
 }) => {
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
@@ -36,7 +32,7 @@ const StoryboardSequence: React.FC<StoryboardSequenceProps> = ({
       setExpandedImage(null);
     } else {
       setExpandedImage(imageUrl);
-      setGeneratedVideoUrl(null); // Reset video URL when opening a new image
+      setGeneratedVideoUrl(null); 
     }
   };
 
@@ -52,7 +48,6 @@ const StoryboardSequence: React.FC<StoryboardSequenceProps> = ({
       }
     } catch (error) {
       console.error('Error generating image:', error);
-      // Handle error (e.g., show an error message to the user)
     } finally {
       setIsGeneratingImage(false);
     }
@@ -65,17 +60,44 @@ const StoryboardSequence: React.FC<StoryboardSequenceProps> = ({
     try {
       const videoUrl = await generateVideo(videoPrompt, expandedImage);
       setGeneratedVideoUrl(videoUrl);
-      onUpdateImage(expandedImage, videoUrl); // Replace the image with the video in the main grid
+      onUpdateImage(expandedImage, videoUrl); 
     } catch (error) {
       console.error('Error generating video:', error);
-      // Handle error (e.g., show an error message to the user)
     } finally {
       setIsGeneratingVideo(false);
     }
   };
 
+  const GenerationSection = ({title, prompt, placeholder, onGenerate, isGenerating, children}: {title: string, prompt: string, placeholder: string, onGenerate: () => void, isGenerating: boolean, children: React.ReactNode}) => {
+    return (
+      <Card className="h-full bg-black border-0 shadow-lg flex flex-col overflow-hidden">
+        <CardContent className="flex-grow flex flex-col justify-center p-0">
+          {children}
+        </CardContent>
+        <CardFooter className="bg-black p-4 flex flex-col space-y-2">
+          <Input
+            value={prompt}
+            onChange={(e) => {
+              if (title === "Regenerate Image") setImagePrompt(e.target.value);
+              else setVideoPrompt(e.target.value);
+            }}
+            placeholder={placeholder}
+            className="mb-2 bg-gray-800 bg-opacity-70 border-gray-700 text-white placeholder-gray-400 h-12 justify-center"
+          />
+          <Button
+            onClick={onGenerate}
+            disabled={isGenerating || !prompt}
+            className="w-full bg-gradient-to-r from-gray-800 to-black hover:from-gray-700 hover:to-gray-900 text-white text-xs px-2 py-1"
+          >
+            {isGenerating ? 'Generating...' : title}
+          </Button>
+        </CardFooter>
+      </Card>
+    )
+  }
+
   return (
-    <div className="bg-gradient-to-br from-gray-900 to-black rounded-lg shadow-md p-4">
+    <div className="bg-black rounded-lg shadow-md p-4">
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {images.map((mediaUrl, index) => (
           <motion.div 
@@ -124,30 +146,11 @@ const StoryboardSequence: React.FC<StoryboardSequenceProps> = ({
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.1 }}
               >
-                <Card className="h-full bg-gradient-to-br from-gray-900 to-black border-0 shadow-lg flex flex-col overflow-hidden">
-                  <CardContent className="flex-grow flex flex-col justify-center p-0">
-                    <div className="relative aspect-video">
-                      <img src={expandedImage} alt="Original image" className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-end p-4">
-                        <Input
-                          value={imagePrompt}
-                          onChange={(e) => setImagePrompt(e.target.value)}
-                          placeholder="Enter prompt for new image"
-                          className="mb-4 bg-gray-800 bg-opacity-70 border-gray-700 text-white placeholder-gray-400"
-                        />
-                      </div>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="bg-gray-900 p-4">
-                    <Button
-                      onClick={handleGenerateImage}
-                      disabled={isGeneratingImage || !imagePrompt}
-                      className="w-full bg-gradient-to-r from-gray-800 to-black hover:from-gray-700 hover:to-gray-900 text-white"
-                    >
-                      {isGeneratingImage ? 'Generating...' : 'Regenerate Image'}
-                    </Button>
-                  </CardFooter>
-                </Card>
+                <GenerationSection title="Regenerate Image" prompt={imagePrompt} placeholder="Enter prompt for new image" onGenerate={handleGenerateImage} isGenerating={isGeneratingImage}>
+                  <div className="relative aspect-video">
+                    <img src={expandedImage} alt="Original image" className="w-full h-full object-cover" />
+                  </div>
+                </GenerationSection>
               </motion.div>
               <motion.div
                 className="w-full md:w-1/2"
@@ -155,35 +158,18 @@ const StoryboardSequence: React.FC<StoryboardSequenceProps> = ({
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.2 }}
               >
-                <Card className="h-full bg-gradient-to-br from-gray-900 to-black border-0 shadow-lg flex flex-col overflow-hidden">
-                  <CardContent className="flex-grow flex flex-col justify-center p-0">
-                    {generatedVideoUrl ? (
-                      <video controls className="w-full aspect-video">
-                        <source src={generatedVideoUrl} type="video/mp4" />
-                        Your browser does not support the video tag.
-                      </video>
-                    ) : (
-                      <div className="w-full aspect-video bg-gray-800 flex items-center justify-center text-gray-400">
-                        Video will appear here
-                      </div>
-                    )}
-                  </CardContent>
-                  <CardFooter className="bg-gray-900 p-4 flex flex-col space-y-4">
-                    <Input
-                      value={videoPrompt}
-                      onChange={(e) => setVideoPrompt(e.target.value)}
-                      placeholder="Enter prompt for video"
-                      className="w-full bg-gray-800 bg-opacity-70 border-gray-700 text-white placeholder-gray-400"
-                    />
-                    <Button
-                      onClick={handleGenerateVideo}
-                      disabled={isGeneratingVideo || !videoPrompt}
-                      className="w-full bg-gradient-to-r from-gray-800 to-black hover:from-gray-700 hover:to-gray-900 text-white"
-                    >
-                      {isGeneratingVideo ? 'Generating...' : 'Generate Video'}
-                    </Button>
-                  </CardFooter>
-                </Card>
+                <GenerationSection title="Generate Video" prompt={videoPrompt} placeholder="Enter prompt for video" onGenerate={handleGenerateVideo} isGenerating={isGeneratingVideo}>
+                  {generatedVideoUrl ? (
+                    <video controls className="w-full aspect-video">
+                      <source src={generatedVideoUrl} type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+                  ) : (
+                    <div className="w-full aspect-video bg-gray-800 flex items-center justify-center text-gray-400">
+                      Video will appear here
+                    </div>
+                  )}
+                </GenerationSection>
               </motion.div>
             </motion.div>
           </motion.div>

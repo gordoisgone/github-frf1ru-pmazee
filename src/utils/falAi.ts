@@ -5,7 +5,7 @@ fal.config({
   credentials: "0a658b6a-905f-439b-a16d-b87fd3d83f29:f9677d854161cc2dce2a5d8690c834f7",
 });
 
-const OPENAI_API_KEY = "sk-svcacct-g3Hv7gI2ydLBx8sAxSEa0VV6svwLxx_XKii9PPb6a63EsMH3OXJfMCGQVT3BlbkFJLFWd-TH0HHkEYYkw-JAtD8YRGEIEA44FnihsfoVAEu4fTBXS68Wa8jnugA";
+//const OPENAI_API_KEY = "sk-svcacct-g3Hv7gI2ydLBx8sAxSEa0VV6svwLxx_XKii9PPb6a63EsMH3OXJfMCGQVT3BlbkFJLFWd-TH0HHkEYYkw-JAtD8YRGEIEA44FnihsfoVAEu4fTBXS68Wa8jnugA";
 
 interface ImageResult {
   images: { url: string }[];
@@ -15,31 +15,31 @@ interface VideoResult {
   video: { url: string };
 }
 
-async function embellishPrompt(prompt: string): Promise<string> {
-  const response = await axios.post(
-    "https://api.openai.com/v1/chat/completions",
-    {
-      model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: prompt }],
-      max_tokens: 100,
-    },
-    {
-      headers: {
-        "Authorization": `Bearer ${OPENAI_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-    }
-  );
-
-  return response.data.choices[0].message.content;
-}
+//async function embellishPrompt(prompt: string): Promise<string> {
+//  const response = await axios.post(
+//    "https://api.openai.com/v1/chat/completions",
+//    {
+//      model: "gpt-3.5-turbo",
+//      messages: [{ role: "user", content: prompt }],
+//      max_tokens: 100,
+//    },
+//    {
+//      headers: {
+//        "Authorization": `Bearer ${OPENAI_API_KEY}`,
+//        "Content-Type": "application/json",
+//      },
+//    }
+//  );
+//
+//  return response.data.choices[0].message.content;
+//}
 
 export async function generateImages(prompt: string): Promise<string[]> {
   console.log("generateImages function called with prompt:", prompt);
   try {
-    console.log("Attempting to embellish prompt...");
-    const embellishedPrompt = await embellishPrompt(prompt);
-    console.log("Embellished prompt:", embellishedPrompt);
+    //console.log("Attempting to embellish prompt...");
+    //const embellishedPrompt = await embellishPrompt(prompt);
+    //console.log("Embellished prompt:", embellishedPrompt);
 
     console.log("Calling fal.subscribe...");
     const result = await fal.subscribe("fal-ai/realistic-vision", {
@@ -51,7 +51,7 @@ export async function generateImages(prompt: string): Promise<string[]> {
           }
         ],
         format: "png",
-        prompt: embellishedPrompt,
+        prompt: prompt, // Use original prompt
         embeddings: [],
         image_size: "landscape_16_9",
         model_name: "SG161222/Realistic_Vision_V6.0_B1_noVAE",
@@ -75,10 +75,10 @@ export async function generateImages(prompt: string): Promise<string[]> {
       const imageUrls = result.images.map(image => image.url);
       console.log("Generated image URLs:", imageUrls);
       
-      // Verify that the URLs are valid
+      // Verify that the URLs are valid using no-cors mode
       const validUrls = await Promise.all(imageUrls.map(async (url) => {
         try {
-          const response = await fetch(url, { method: 'HEAD' });
+          const response = await fetch(url, { method: 'HEAD', mode: 'no-cors' });
           return response.ok ? url : null;
         } catch (error) {
           console.error(`Error verifying URL ${url}:`, error);
@@ -88,11 +88,6 @@ export async function generateImages(prompt: string): Promise<string[]> {
       
       const filteredUrls = validUrls.filter((url): url is string => url !== null);
       console.log("Filtered valid image URLs:", filteredUrls);
-      
-      if (filteredUrls.length === 0) {
-        console.error('No valid image URLs found');
-        return [];
-      }
       
       return filteredUrls;
     } else {
@@ -127,11 +122,11 @@ export async function testFalConnection(): Promise<void> {
 }
 
 export async function generateVideo(prompt: string, imageUrl: string): Promise<string> {
-  const embellishedPrompt = await embellishPrompt(prompt);
+  //const embellishedPrompt = await embellishPrompt(prompt);
   try {
     const result = await fal.subscribe("fal-ai/runway-gen3/turbo/image-to-video", {
       input: {
-        prompt: embellishedPrompt,
+        prompt: prompt, // Use original prompt
         image_url: imageUrl
       },
       logs: true,

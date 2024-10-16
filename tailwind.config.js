@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  darkMode: ["class"],
+  darkMode: "class",
   content: [
     './pages/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
@@ -17,43 +17,71 @@ module.exports = {
     },
     extend: {
       colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        border: "#333",
+        input: "#444",
+        ring: "#555",
+        background: "#111",
+        foreground: "#eee",
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "#888",
+          foreground: "#111",
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+          DEFAULT: "#777",
+          foreground: "#111",
         },
         destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
+          DEFAULT: "#ff5757",
+          foreground: "#111",
         },
         muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
+          DEFAULT: "#444",
+          foreground: "#eee",
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
+          DEFAULT: "#666",
+          foreground: "#111",
         },
         popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
+          DEFAULT: "#222",
+          foreground: "#eee",
         },
         card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+          DEFAULT: "#222",
+          foreground: "#eee",
         },
-        'selected-border': '#00FF00', // Bright green color
-        'neon-green': '#00FF00',
-        'primary-dark': 'hsl(var(--primary-dark))',
-        'custom-gray': 'rgba(128, 128, 128, 0.6)', // This is 60% grey
+        'selected-border': '#fff', 
+        'neon-green': '#fff',
+        'primary-dark': '#333',
+        'custom-gray': '#808080', 
+        gray: {
+          50: '#1f2937',
+          100: '#111827',
+          200: '#000',
+          300: '#222',
+          400: '#333',
+          500: '#444',
+          600: '#555',
+          700: '#666',
+          800: '#777',
+          900: '#888',
+          950: '#999',
+        },
+        metallic: {
+          100: '#222',
+          200: '#333',
+          300: '#444',
+          400: '#555',
+          500: '#666',
+          600: '#777',
+          700: '#888',
+          800: '#999',
+          900: '#aaa',
+        }
+      },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(circle at center, #222 0%, #111 100%)',
+        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, #222 0deg, #111 360deg)',
       },
       borderRadius: {
         lg: "var(--radius)",

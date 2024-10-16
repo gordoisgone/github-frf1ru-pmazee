@@ -9,7 +9,6 @@ function App() {
   const [currentSequence, setCurrentSequence] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [progress, setProgress] = useState(0)
-  const [selectedImages, setSelectedImages] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     console.log('App component mounted');
@@ -44,31 +43,19 @@ function App() {
     setSequences(sequences.filter((_, i) => i !== index))
   }
 
-  const toggleImageSelection = (imageUrl: string) => {
-    setSelectedImages(prev => {
-      const newSet = new Set(prev)
-      if (newSet.has(imageUrl)) {
-        newSet.delete(imageUrl)
-      } else {
-        newSet.add(imageUrl)
-      }
-      return newSet
-    })
-  }
-
   const handleUpdateImage = (oldImageUrl: string, newImageUrl: string) => {
     setCurrentSequence(prev => prev.map(img => img === oldImageUrl ? newImageUrl : img));
     setSequences(prev => prev.map(seq => seq.map(img => img === oldImageUrl ? newImageUrl : img)));
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-gray-300 p-4">
+    <div className="min-h-screen bg-black text-gray-300 p-4"> {/* Changed background color */}
       <div className="container mx-auto">
         <h1 className="text-4xl md:text-5xl tracking-tight mb-8 text-primary uppercase">
           <span className="italic font-bold">NERATE</span>{' '}
           <span className="font-normal text-custom-gray">SEQUENCE</span>
         </h1>
-        <div className="w-full max-w-none mx-auto bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg shadow-md p-6 mb-8">
+        <div className="w-full max-w-none mx-auto bg-black rounded-lg shadow-md p-6 mb-8"> {/* Changed background color */}
           <StoryboardPrompt 
             onGenerate={handleGenerateSequence} 
             isLoading={isLoading}
@@ -91,8 +78,6 @@ function App() {
                 onDelete={handleDeleteCurrentSequence}
                 onSave={handleSaveSequence}
                 showControls={true}
-                selectedImages={selectedImages}
-                toggleImageSelection={toggleImageSelection}
                 onUpdateImage={handleUpdateImage}
               />
             </motion.div>
@@ -112,8 +97,6 @@ function App() {
                 images={sequence} 
                 onDelete={() => handleDeleteSavedSequence(index)}
                 showControls={true}
-                selectedImages={selectedImages}
-                toggleImageSelection={toggleImageSelection}
                 onUpdateImage={handleUpdateImage}
               />
             </motion.div>

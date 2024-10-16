@@ -35,3 +35,8 @@ SB1-KSAXZM/
 ├── tsconfig.node.json
 ├── vite.config.ts
 
+
+
+python3 -m venv .venv
+source .venv/bin/activate
+pip install aider-chat
