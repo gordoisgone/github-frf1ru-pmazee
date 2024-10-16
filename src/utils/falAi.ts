@@ -69,19 +69,19 @@ export async function generateImages(prompt: string): Promise<string[]> {
       },
     }) as ImageResult;
 
-    console.log("fal.subscribe completed. Result:", result);
+    console.log("fal.subscribe completed. Result:", JSON.stringify(result, null, 2));
 
     if (result && 'images' in result && Array.isArray(result.images)) {
       const imageUrls = result.images.map(image => image.url);
       console.log("Generated image URLs:", imageUrls);
       return imageUrls;
     } else {
-      console.error('Unexpected result format:', result);
+      console.error('Unexpected result format:', JSON.stringify(result, null, 2));
       throw new Error('Unexpected result format');
     }
   } catch (error) {
     console.error('Error generating images:', error);
-    console.error('Error details:', error);
+    console.error('Error details:', JSON.stringify(error, null, 2));
     if (error instanceof Error) {
       console.error('Error message:', error.message);
       console.error('Error stack:', error.stack);
@@ -89,6 +89,22 @@ export async function generateImages(prompt: string): Promise<string[]> {
     // Instead of throwing, return an empty array and log the error
     console.error('Returning empty array due to error');
     return [];
+  }
+}
+
+// Add this function to test the API connection
+export async function testFalConnection(): Promise<void> {
+  console.log("Testing FAL AI connection...");
+  try {
+    const result = await fal.subscribe("fal-ai/realistic-vision", {
+      input: {
+        prompt: "Test prompt",
+        num_images: 1,
+      },
+    });
+    console.log("FAL AI connection test result:", JSON.stringify(result, null, 2));
+  } catch (error) {
+    console.error("FAL AI connection test failed:", error);
   }
 }
 
